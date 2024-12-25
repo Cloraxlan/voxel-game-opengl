@@ -10,6 +10,11 @@
 #include "Shader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "glm/detail/type_mat.hpp"
+#include "glm/vec3.hpp"
+#include "glm/detail/func_trigonometric.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 void Shader::addVertexShader(std::string path) {
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -122,4 +127,24 @@ void Shader::addTexture(std::string path, std::string key) {
     stbi_image_free(data);
     textures.push_back(texture);
     texture_keys.push_back(key);
+}
+
+void RotationShader::apply(){
+    Shader::apply();
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::scale(trans, glm::vec3(sin((float)glfwGetTime()), sin((float)glfwGetTime()), sin((float)glfwGetTime())));
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    unsigned int transformLoc = glGetUniformLocation(getShaderProgram(), "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+}
+
+void ShaderPipeline::addEffect(ShaderEffect &effect) {
+    effects.push_back(&effect);
+}
+
+void ShaderPipeline::apply() {
+    Shader::apply();
+    for(ShaderEffect *effect : effects){
+        effect->applyEffect(getShaderProgram());
+    }
 }

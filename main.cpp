@@ -34,12 +34,18 @@ int main(){
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-    Shader s;
-    s.addVertexShader("./shaders/vertex/voxel.vert");
+
+    glEnable(GL_DEPTH_TEST);
+
+
+    ShaderPipeline s;
+    s.addVertexShader("./shaders/vertex/flat.vert");
     s.addFragShader("./shaders/frag/textureVoxel.frag");
-    s.addTexture("./img_1.png", "voxelTexture");
+    s.addTexture("./img.png", "voxelTexture");
+    FlatPerspectiveEffect flat;
+    s.addEffect(flat);
     s.compile();
-    Voxel v(glm::vec3(0,0,0), s);
+    Voxel v;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -48,7 +54,7 @@ int main(){
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        v.draw();
+        v.draw(s);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

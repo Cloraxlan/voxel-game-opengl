@@ -8,14 +8,15 @@
 
 #include <string>
 #include <vector>
+#include "ShaderEffect.h"
 
 class Shader {
 public:
     void addVertexShader(std::string path);
     void addFragShader(std::string path);
     void addTexture(std::string path, std::string key);
-    void compile();
-    void apply();
+    virtual void compile();
+    virtual void apply();
     unsigned int getShaderProgram();
 private:
     std::string readFromFile(std::string path);
@@ -27,6 +28,20 @@ private:
 };
 
 
+class ShaderPipeline: public Shader{
+public:
+    void apply() override;
+    void addEffect(ShaderEffect &effect);
+private:
+    std::vector<ShaderEffect*> effects;
+};
+
+class RotationShader : public Shader{
+public:
+    void apply() override;
+private:
+    double rotation = 0;
+};
 
 
 #endif //VOXEL_GAME_OPENGL_SHADER_H

@@ -3,13 +3,28 @@
 //
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include "Voxel.h"
 
-Voxel::Voxel(glm::vec3 pos, Shader shd) {
-    shader = shd;
-    position = pos;
-    generateVertices();
+void Voxel::draw(Shader &shd) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    shd.apply();
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+Voxel::Voxel(std::vector<Vertex> vertices, std::vector<int> indices) {
+    this->indices = indices;
+    this->vertices = vertices;
+    loadVertices();
+}
+
+Voxel::Voxel() {
+    this->indices = CUBE_INDICES;
+    this->vertices = CUBE;
+    loadVertices();
+}
+
+void Voxel::loadVertices() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -25,23 +40,11 @@ Voxel::Voxel(glm::vec3 pos, Shader shd) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3)));
     glEnableVertexAttribArray(1);
-    // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(2*sizeof(glm::vec3)));
-    glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 
-void Voxel::draw() {
-    shader.apply();
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-}
 
-void Voxel::generateVertices() {
-    vertices = std::vector<Vertex>(SQUARE);
-    indices = std::vector<int>(SQUARE_INDICES);
-}

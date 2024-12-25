@@ -7,6 +7,7 @@ add_executable(voxel-game-opengl main.cpp glad.c
         Voxel.h
         Voxel.cpp
         stb_image.h
+        ShaderEffect.cpp
 )
 target_include_directories(voxel-game-opengl PUBLIC F:/mingw/include)
 add_subdirectory(glfw)
